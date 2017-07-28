@@ -11,8 +11,10 @@ for i = 1:size(Data, 2)
     smallest_distance = 100000;
     index = 0;
     
+    x = DataT(i, :);
     for j = 1:k
-        d = dist(mu(j, :), DataT(i, :));
+        m = mu(j, :);
+        d = pdist2(m, x);
 
         if smallest_distance > d
             smallest_distance = d;
@@ -20,24 +22,22 @@ for i = 1:size(Data, 2)
         end
 
     end
-    clusterData{index} = [clusterData{index}; DataT(i, :)];
+    clusterData{index} = [clusterData{index}; x];
 end
 
-scatter(DataT(:, 1), DataT(:, 2));
+scatter3(DataT(:, 1), DataT(:, 2), zeros(1, n));
 hold on;
-scatter(mu(:, 1), mu(:, 2), 'red');
+scatter3(mu(:, 1), mu(:, 2), zeros(1, k), 'red');
 
 
 sigma = cell(1, k);
 p = zeros(1, k);
 gmm = zeros(1, k);
-x1 = -3:1e-1:3;
-x = [x1' x1'];
 
 for i = 1:k
     p(i) = size(clusterData{index}, 1) / n;
     sigma{i} = cov(clusterData{i});
     
-    l = mvnpdf(x, mu(i, :), sigma{i});%, mu(i, :), sigma{i});
-    plot(x, l)
+    l = mvnpdf(clusterData{i}, mu(i, :), sigma{i});
+    plot(clusterData{i}, l);
 end
