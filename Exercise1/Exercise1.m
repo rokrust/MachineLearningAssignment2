@@ -7,12 +7,11 @@ Data = Data';
 [mu, sigma, pi] = initGmm(Data, k);
 gamma = zeros(n, k);
 prev_likelihood = 0; 
-threshold = 0.0001;
+threshold = 0.01;
 logLikelihood = threshold+0.00000000001;
 
 iter = 0;
 while logLikelihood - prev_likelihood > threshold
-    iter = iter + 1;
     prev_likelihood = logLikelihood;
     logLikelihood = 0;
     
@@ -32,19 +31,11 @@ while logLikelihood - prev_likelihood > threshold
     end
     
     n_k = sum(gamma);
+    mu = (gamma' * Data) ./ repmat(n_k', 1, 2);
 
     for i = 1:k
-        mu(i, :) = gamma(:, i)' * Data / n_k(i);
         zeroMeanData = Data - repmat(mu(i, :), n, 1);
-        
-        cov_sum = zeros(dim, dim);
-        for j = 1:n
-            blurg = zeroMeanData(j, :)' * zeroMeanData(j, :);
-            cov_sum = cov_sum + gamma(j, i) * (zeroMeanData(j, :)' * zeroMeanData(j, :));
-            %sigma(:, :, i) = (repmat(gamma(:, i), 1, dim) .* zeroMeanData)' * zeroMeanData;
-        end
-        
-        sigma(:, :, i) = cov_sum / n_k(i);
+        sigma(:, :, i) = repmat(gamma(:, i), 1, dim)' .* zeroMeanData' * zeroMeanData / n_k(i);
     end
 
     pi = n_k / n;
