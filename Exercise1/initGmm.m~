@@ -1,0 +1,38 @@
+function [mu, sigma, pi] = initGmm(Data, k)
+    [n, dim] = size(Data);
+    
+    sigma = zeros(k, dim, dim);
+    pi = zeros(1, k);
+
+    [~, mu] = kmeans(Data, k);
+    
+    clusterData = cell(1, k);
+    
+    %Split data by closest cluster
+    for i = 1:size(Data, 2)
+        smallest_distance = 100000;
+        index = 0;
+    
+        x = Data(i, :);
+        for j = 1:k
+            m = mu(j, :);
+            d = pdist2(m, x);
+
+            if smallest_distance > d
+                smallest_distance = d;
+                index = j;
+            end
+
+        end
+        
+        clusterData{index} = [clusterData{index}; x];
+    end
+
+    %estimate parameters
+    for i = 1:k
+        n_c = size(clusterData{index}, 1)
+        pi(i) = size(clusterData{index}, 1) / n;
+        sigma(i, :, :) = cov(clusterData{i});
+    end
+
+end

@@ -39,12 +39,11 @@ while logLikelihood - prev_likelihood > threshold
         
         cov_sum = zeros(dim, dim);
         for j = 1:n
-            blurg = zeroMeanData(j, :)' * zeroMeanData(j, :);
-            cov_sum = cov_sum + gamma(j, i) * (zeroMeanData(j, :)' * zeroMeanData(j, :));
+            
+            cov_sum = cov_sum + gamma(j, i) * (zeroMeanData(j, i) * zeroMeanData(j, i)');
             %sigma(:, :, i) = (repmat(gamma(:, i), 1, dim) .* zeroMeanData)' * zeroMeanData;
         end
         
-        sigma(:, :, i) = cov_sum / n_k(i);
     end
 
     pi = n_k / n;
